@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping make Job Board useful for more people. Start with the [README](README.md) setup and scope.
+Thanks for helping make Engram-Job-Board useful for more people. Start with the [setup guide](docs/setup.md) for installation and project scope.
 
 ## Local setup and checks
 

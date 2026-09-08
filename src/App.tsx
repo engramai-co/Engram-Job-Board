@@ -47,7 +47,7 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    document.title = `${view === "applications" ? "Application tracker" : "Research"} — ${data.profile.name}`;
+    document.title = `Engram-Job-Board · ${view === "applications" ? "Application tracker" : "Research"} — ${data.profile.name}`;
     const canonicalHash = `#${view}`;
     if (window.location.hash !== canonicalHash) window.history.replaceState({ dashboardView: view }, "", canonicalHash);
   }, [view]);
