@@ -1,6 +1,6 @@
 # Governance
 
-Job Board is an Engram-maintained open-source project. Repository administrators under [engramai-co](https://github.com/engramai-co) control access, merging, releases and security reporting.
+Engram-Job-Board is an Engram-maintained open-source project. Repository administrators under [engramai-co](https://github.com/engramai-co) control access, merging, releases and security reporting.
 
 ## Decisions
 

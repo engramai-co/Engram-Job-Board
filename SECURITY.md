@@ -2,7 +2,7 @@
 
 ## Report privately
 
-Please use [GitHub private vulnerability reporting](https://github.com/engramai-co/job-board/security/advisories/new). Include the affected version, a minimal reproduction using synthetic data, the expected impact and any suggested fix. Do not open a public issue containing an exploit, credentials or personal data.
+Please use [GitHub private vulnerability reporting](https://github.com/engramai-co/Engram-Job-Board/security/advisories/new). Include the affected version, a minimal reproduction using synthetic data, the expected impact and any suggested fix. Do not open a public issue containing an exploit, credentials or personal data.
 
 If private reporting is unavailable, open a minimal issue asking maintainers to enable it **without disclosing the vulnerability**. Maintainers will triage on a best-effort basis; this early project does not promise a response SLA. Only the current `main` branch is maintained.
 

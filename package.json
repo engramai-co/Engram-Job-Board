@@ -1,12 +1,12 @@
 {
-  "name": "@engramai/job-board",
+  "name": "engram-job-board",
   "private": true,
   "version": "0.1.0",
   "description": "A local-first, code-maintained application tracker and evidence-led job research board.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/engramai-co/job-board.git"
+    "url": "https://github.com/engramai-co/Engram-Job-Board.git"
   },
   "engines": {
     "node": ">=24.0.0"

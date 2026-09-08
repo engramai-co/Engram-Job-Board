@@ -24,7 +24,7 @@ export function Sidebar({ view, cycle, activeCount, offerCount, onChange }: Side
           <path d="M4 6h24l8 8v20H4z" />
           <path d="M28 6v8h8M11 17h17M11 23h12M11 29h15" />
         </svg>
-        <span><strong>Job Board</strong><small>Research to application</small></span>
+        <span><strong>Engram-Job-Board</strong><small>Research to application</small></span>
       </a>
 
       <nav className="rail-nav" aria-label="Dashboard views">
