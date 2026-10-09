@@ -67,10 +67,10 @@ test("location counts do not turn a multi-office JD into an invented application
     const label = lib.portfolioDimension(item, "area");
     counts.set(label, (counts.get(label) || 0) + 1);
   }
-  assert.deepEqual(Object.fromEntries(counts), { London: 2, Singapore: 1, Unknown: 1 });
+  assert.deepEqual(Object.fromEntries(counts), { "伦敦": 2, Singapore: 1, "待确认": 1 });
   const unselected = portfolio.find((item) => item.company === "Demo Orbit");
   assert.match(unselected.location, /multiple locations/i);
-  assert.equal(lib.portfolioDimension(unselected, "area"), "Unknown");
+  assert.equal(lib.portfolioDimension(unselected, "area"), "待确认");
 });
 
 test("official role titles remain distinct while normalized chart families overlap", () => {
@@ -80,25 +80,31 @@ test("official role titles remain distinct while normalized chart families overl
   assert.notEqual(researchEngineer.role, appliedEngineer.role);
   assert.equal(lib.portfolioDimension(researchEngineer, "role"), "AI / Research Engineering");
   assert.equal(lib.portfolioDimension(appliedEngineer, "role"), "AI / Research Engineering");
-  assert.equal(lib.portfolioDimension({ ...researchEngineer, mixRole: undefined, category: "" }, "role"), "Unknown");
-  assert.equal(lib.portfolioDimension({ ...researchEngineer, industry: "" }, "industry"), "Unknown");
+  assert.equal(lib.portfolioDimension({ ...researchEngineer, mixRole: undefined, category: "" }, "role"), "待确认");
+  assert.equal(lib.portfolioDimension({ ...researchEngineer, industry: "" }, "industry"), "待确认");
 });
 
 test("application table filtering uses the same normalized dimension as its chart", async () => {
   const { createElement } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { ApplicationTable } = await server.ssrLoadModule("/src/components/ApplicationTable.tsx");
-  const render = (filter) => renderToStaticMarkup(createElement(ApplicationTable, {
-    items: lib.getPortfolioItems(), filter, onClear() {}
-  }));
-  const unknownOffice = render({ view: "area", label: "Unknown" });
+  const { UIProvider } = await server.ssrLoadModule("/src/ui.tsx");
+  const { ProgressProvider } = await server.ssrLoadModule("/src/ProgressContext.tsx");
+  const { WorkspaceEditors } = await server.ssrLoadModule("/src/components/WorkspaceEditors.tsx");
+  const render = (filter) => renderToStaticMarkup(createElement(UIProvider, null,
+    createElement(ProgressProvider, null, createElement(WorkspaceEditors, null,
+      createElement(ApplicationTable, { items: lib.getPortfolioItems(), filter, onClear() {}, onShowResearch() {} })))));
+  const unknownOffice = render({ view: "area", label: "待确认" });
   assert.match(unknownOffice, /Demo Orbit/);
   assert.doesNotMatch(unknownOffice, /Demo Aurora|Demo Harbor|Demo Cedar/);
   const sharedRole = render({ view: "role", label: "AI / Research Engineering" });
   assert.match(sharedRole, /Demo Aurora/);
   assert.match(sharedRole, /Demo Orbit/);
   assert.doesNotMatch(sharedRole, /Demo Harbor|Demo Cedar/);
-  assert.match(render({ view: "area", label: "Missing location" }), /No portfolio records match/);
+  assert.match(render({ view: "area", label: "Missing location" }), /没有符合条件的申请/);
+  const all = render(null);
+  assert.match(all, /Offer · 比较基准/);
+  assert.doesNotMatch(all, /aria-label="申请状态：Offer，Demo Cedar/);
 });
 
 test("baseline cash separates one-time sign-on from recurring compensation", () => {
@@ -119,7 +125,12 @@ test("untrusted external links cannot use executable or local-file schemes", () 
 });
 
 test("JD evidence does not claim an unchecked or undated opening was browser-verified", () => {
-  assert.equal(lib.jdEvidence("Unchecked", ""), "Unchecked · browser evidence not recorded");
-  assert.equal(lib.jdEvidence("Live", ""), "Live · browser evidence not recorded");
-  assert.match(lib.jdEvidence("Closed", "2026-08-20"), /^Closed · checked 20 Aug 2026$/);
+  assert.match(lib.jdEvidence("Unchecked", ""), /尚无浏览器核验记录/);
+  assert.match(lib.jdEvidence("Live", ""), /尚无浏览器核验记录/);
+  assert.match(lib.jdEvidence("Closed", "2026-08-20"), /核验方式未记录/);
+  assert.match(lib.jdEvidence("Live", "2026-08-20", "Browser"), /浏览器核验/);
+  assert.match(lib.jdEvidence("Live", "2026-08-20", "Full text"), /网页全文核验/);
+  assert.doesNotMatch(lib.jdEvidence("Live", "2026-08-20", "Full text"), /浏览器核验/);
+  assert.equal(lib.jdSourceLabel({url:"https://example.com/job"}), "JD 来源待核验");
+  assert.equal(lib.jdSourceLabel({url:"https://example.com/job",source:"Employer"}), "官方 JD");
 });

@@ -4,6 +4,7 @@ import { BarChart } from "echarts/charts";
 import { GridComponent, LegendComponent, TooltipComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import type { Opportunity, ResearchStatus } from "../types";
+import { displayLabel, researchDecisionLabel } from "../lib";
 
 echarts.use([BarChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
 
@@ -13,6 +14,9 @@ export interface ResearchFilterState {
 }
 
 export const researchStatusOrder: ResearchStatus[] = [
+  "Applied",
+  "Rejected",
+  "Ready to apply",
   "Needs validation",
   "High-upside reach",
   "Monitor opening",
@@ -22,6 +26,8 @@ export const researchStatusOrder: ResearchStatus[] = [
 
 const statusColors: Record<ResearchStatus, string> = {
   Applied: "#2f6a4f",
+  Rejected: "#b6543d",
+  "Ready to apply": "#2f6a4f",
   "Needs validation": "#b88935",
   "High-upside reach": "#7d6b91",
   "Monitor opening": "#577c9b",
@@ -51,10 +57,10 @@ export function ResearchCharts({ items, filter, onFilterChange }: { items: Oppor
         backgroundColor: "#17231c",
         borderWidth: 0,
         textStyle: { color: "#fffef8", fontSize: 12 },
-        formatter: ({ name, value }: { name: string; value: number }) => `${name}\n${value} research record${value === 1 ? "" : "s"}`
+        formatter: ({ name, value }: { name: string; value: number }) => `${researchDecisionLabel(name)}\n${value} 条研究记录`
       },
       xAxis: { type: "value", minInterval: 1, ...axis },
-      yAxis: { type: "category", inverse: true, data: taxonomyData.map((item) => item.status), ...axis },
+      yAxis: { type: "category", inverse: true, data: taxonomyData.map((item) => item.status), ...axis, axisLabel: { ...axis.axisLabel, formatter: researchDecisionLabel } },
       series: [{
         type: "bar",
         barWidth: 17,
@@ -68,17 +74,17 @@ export function ResearchCharts({ items, filter, onFilterChange }: { items: Oppor
       animationEasing: "cubicOut",
       color: researchStatusOrder.map((status) => statusColors[status]),
       grid: { left: 112, right: 24, top: 64, bottom: 34 },
-      legend: { type: "scroll", top: 4, left: 0, right: 0, itemWidth: 9, itemHeight: 9, textStyle: { color: "#657068", fontSize: 10 } },
+      legend: { type: "scroll", top: 4, left: 0, right: 0, itemWidth: 9, itemHeight: 9, textStyle: { color: "#657068", fontSize: 10 }, formatter: researchDecisionLabel },
       tooltip: {
         trigger: "item",
         renderMode: "richText",
         backgroundColor: "#17231c",
         borderWidth: 0,
         textStyle: { color: "#fffef8", fontSize: 12 },
-        formatter: ({ seriesName, name, value }: { seriesName: string; name: string; value: number }) => `${name}\n${seriesName}: ${value}`
+        formatter: ({ seriesName, name, value }: { seriesName: string; name: string; value: number }) => `${displayLabel(name)}\n${researchDecisionLabel(seriesName)}：${value} 条`
       },
       xAxis: { type: "value", minInterval: 1, ...axis },
-      yAxis: { type: "category", inverse: true, data: industries, ...axis },
+      yAxis: { type: "category", inverse: true, data: industries, ...axis, axisLabel: { ...axis.axisLabel, formatter: displayLabel } },
       series: researchStatusOrder.map((status) => ({
         name: status,
         type: "bar",
@@ -107,10 +113,10 @@ export function ResearchCharts({ items, filter, onFilterChange }: { items: Oppor
 
   return (
     <section className="research-visuals" aria-labelledby="research-visuals-heading">
-      <div className="section-heading"><div><h2 id="research-visuals-heading">Research landscape</h2><p>Understand the next action and the opportunity mix. Click either chart to filter the research ledger.</p></div></div>
+      <div className="section-heading"><div><h2 id="research-visuals-heading">研究概览</h2><p>查看岗位分布与推进条件；点击任一图表可筛选下方岗位表。</p></div></div>
       <div className="research-chart-grid">
-        <figure className="research-chart-panel"><figcaption><strong>Decision taxonomy</strong><span>What has to happen before this role deserves time.</span></figcaption><div className="research-chart" ref={taxonomyElement} role="img" aria-label="Research opportunities by decision taxonomy" /></figure>
-        <figure className="research-chart-panel"><figcaption><strong>Taxonomy by industry</strong><span>Where the actionable and gated opportunities sit.</span></figcaption><div className="research-chart" ref={landscapeElement} role="img" aria-label="Research taxonomy broken down by industry" /></figure>
+        <figure className="research-chart-panel"><figcaption><strong>推进状态</strong><span>区分可以申请、需要确认和暂不推进的机会。</span></figcaption><div className="research-chart" ref={taxonomyElement} role="img" aria-label="按推进状态统计的岗位数量" /></figure>
+        <figure className="research-chart-panel"><figcaption><strong>各行业的推进状态</strong><span>查看不同领域的机会与待确认条件。</span></figcaption><div className="research-chart" ref={landscapeElement} role="img" aria-label="按行业分组的岗位推进状态" /></figure>
       </div>
     </section>
   );

@@ -1,8 +1,33 @@
 export type DashboardView = "applications" | "research";
-export type MixView = "status" | "area" | "role" | "industry";
-export type Stage = "Researching" | "Applied" | "OA" | "Interviewing" | "Final round" | "Offer";
-export type ResearchStatus = "Applied" | "Needs validation" | "High-upside reach" | "Monitor opening" | "Deprioritized" | "Not actionable";
-export type JDStatus = "Live" | "Evergreen" | "Closed" | "Unchecked";
+export type MixView = "status" | "area" | "role" | "industry" | "contract" | "timing";
+export type SearchTrack = "now" | "summer-2027";
+export type TrackFilter = SearchTrack | "all";
+export type ContractType = "Freelance" | "Internship" | "Part-time" | "Full-time" | "Volunteer";
+export interface WorkTerms {
+  track: SearchTrack | null;
+  contract: ContractType | null;
+  start: string;
+  hours: string;
+  duration: string;
+  workplace: "On-site" | "Hybrid" | "Remote" | "Not stated";
+  travel: string;
+  payUnit: "hour" | "day" | "project" | "month" | "year" | "Not stated";
+  portfolio: string;
+  deadline: string | null;
+}
+export interface SearchPlan {
+  headline: string;
+  education: string;
+  location: string;
+  preferences: string[];
+  tracks: { id: SearchTrack; title: string; description: string; contracts: ContractType[]; caveat: string }[];
+  families: { id: string; label: string; searchStatus: "Active focus" | "Search paused"; fit: "Strong evidence" | "Adjacent" | "Explore"; evidence: string; keywords: string[]; nextStep: string }[];
+  checks: string[];
+  sources: { title: string; note: string }[];
+}
+export type Stage = "Researching" | "Applied" | "OA" | "Interviewing" | "Final round" | "Offer" | "Rejected" | "Waitlist" | "Withdrawn";
+export type ResearchStatus = "Applied" | "Rejected" | "Ready to apply" | "Needs validation" | "High-upside reach" | "Monitor opening" | "Deprioritized" | "Not actionable";
+export type JDStatus = "Live" | "Evergreen" | "Closed" | "Unchecked" | "Availability unclear";
 export type Tone = "positive" | "warning" | "stretch" | "muted";
 
 export interface Compensation {
@@ -24,6 +49,21 @@ export interface JD {
   url: string;
   status: JDStatus;
   checkedAt: string;
+  source?: "Employer" | "LinkedIn" | "Indeed" | "User";
+  verification?: "Browser" | "Full text" | "Historical index" | "Unverified";
+  match?: "Confirmed" | "Probable" | "Unresolved";
+  note?: string;
+  references?: { label: string; url: string; checkedAt: string }[];
+}
+
+export interface DiscoveryEvidence {
+  source: "LinkedIn";
+  url: string;
+  checkedAt: string;
+  postedLabel: string;
+  postingKind: "Posted" | "Reposted";
+  officialPostedAt?: string;
+  note: string;
 }
 
 export interface Alignment {
@@ -33,6 +73,8 @@ export interface Alignment {
 }
 
 export interface ApplicationEvidence {
+  source?: "manual" | "user" | "screenshot";
+  recordedAt?: string;
   confirmedAt: string;
   evidence: string;
   confirmationSubject: string;
@@ -63,6 +105,7 @@ export interface Opportunity {
   coreAi: boolean | null;
   alignment: Alignment;
   jd: JD;
+  discovery?: DiscoveryEvidence;
   application?: ApplicationEvidence;
   compensation: Compensation;
   culture?: CultureEvidence;
@@ -70,6 +113,34 @@ export interface Opportunity {
   eligibility: string;
   hardGap: string;
   nextStep: string;
+  work?: WorkTerms;
+  assessment?: OpportunityAssessment;
+  detailedAssessment?: DetailedAssessment;
+  personalNotes?: string;
+  appliedDate?: string;
+  followUp?: string;
+  contact?: string;
+  archived?: boolean;
+  userEdited?: boolean;
+}
+
+export type ScoreDimension = "content" | "evidence" | "feasibility" | "platform";
+export interface OpportunityAssessment {
+  assessedAt: string;
+  scores: Record<ScoreDimension, { value: 1 | 2 | 3 | 4 | 5; reason: string }>;
+  reservation: string;
+}
+
+/** Legacy star assessments remain history; they are not converted into points. */
+export type DetailedDimension = "content" | "evidence" | "growth" | "platform";
+export interface DetailedAssessment {
+  version: "evidence-100-v1";
+  assessedAt: string;
+  dimensions: Record<DetailedDimension, {
+    reason: string;
+    criteria: Record<string, { value: number | null; reason: string }>;
+  }>;
+  reservation: string;
 }
 
 export type OpportunityInput = Omit<
@@ -129,6 +200,7 @@ export interface CalendarEvent {
 
 export interface DashboardData {
   profile: { name: string; cycle: string; cycleOpened: string; currency: string };
+  searchPlan?: SearchPlan;
   research: {
     asOf: string;
     lastReviewed: string;
@@ -181,4 +253,9 @@ export interface PortfolioItem {
   compensation: Pick<Compensation, "display" | "source">;
   nextStep: string;
   jd?: JD;
+  work?: WorkTerms;
+  personalNotes?: string;
+  appliedDate?: string;
+  followUp?: string;
+  contact?: string;
 }

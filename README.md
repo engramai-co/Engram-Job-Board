@@ -2,7 +2,7 @@
 
 ## Job research skill
 
-[**job-research**](skills/job-research/SKILL.md) turns employer discovery into evidence-backed decisions: search → official careers-site inspection → exact JD → fit and compensation comparison → next action. It uses your own target roles, locations, experience and baseline, and can maintain the dashboard when requested.
+[**job-research**](skills/job-research/SKILL.md) turns LinkedIn and employer-site discovery into a small, evidence-backed shortlist: exact JD → candidate evidence → contract-specific scoring → next action. It keeps full-time and internship/part-time/project opportunities separate, flags stale evidence without reducing fit scores, and maintains linked research/application records only when requested.
 
 After cloning the repository (see below), install the skill for Codex from the repository root:
 
@@ -26,6 +26,6 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open the local URL printed in the terminal. The starter uses fictional demo data.
+Open the local URL printed in the terminal. The starter uses fictional demo data. Update application status, add interviews and events, and export browser-local edits as a backup. Nothing is automatically submitted or uploaded.
 
 For private data, builds, troubleshooting and development, see the [detailed setup guide](docs/setup.md).

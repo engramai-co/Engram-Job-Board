@@ -1,4 +1,4 @@
 interface:
   display_name: "Job Research"
-  short_description: "Evidence-led job research and exact-JD diligence"
-  default_prompt: "Use $job-research to investigate specific official JDs against my target profile and show evidence, gaps, and next steps."
+  short_description: "Exact-JD discovery, evidence scoring and tracker upkeep"
+  default_prompt: "Use $job-research to find a small set of relevant jobs through LinkedIn and official careers sites, verify the exact JDs, compare within contract pools, and report evidence, gaps and next steps. Update the tracker only if requested; do not apply."

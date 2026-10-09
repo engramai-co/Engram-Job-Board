@@ -11,6 +11,8 @@ If private reporting is unavailable, open a minimal issue asking maintainers to 
 - The app has no authentication, database, telemetry or mail connector. Links open third-party sites only when followed.
 - Dev and preview servers bind to loopback by default. Do not expose a private-data instance to a shared network.
 - Gitignored data is still readable by local tools and the development server.
+- Browser edits and exported JSON backups are not encrypted. They may contain private notes, contacts and application history; keep backups private and away from Git.
+- Backups are validated and restored without overwriting existing IDs. Corrupt storage and revision conflicts block saves rather than silently replacing data.
 - `pnpm build` excludes the designated local data module. `pnpm build:local` intentionally includes it, producing private artifacts in `dist-local/`.
 - Any data in a deployed static build is downloadable. Hiding a field in the UI does not hide it from the bundle.
 - Never place credentials in frontend data, environment variables, or `public/`. No frontend secret storage is provided.
