@@ -1,4 +1,12 @@
-import type { Compensation, DashboardData, Opportunity } from "../types";
+import type { Compensation, DashboardData, DetailedAssessment, Opportunity } from "../types";
+import { scoreDimensions } from "../ranking";
+
+/** Illustrative scores only: not an assessment of a real person or employer. */
+function sampleAssessment(values: number[]): DetailedAssessment {
+  return { version: "evidence-100-v1", assessedAt: "2026-08-20", reservation: "虚构评分，仅用于演示分组、权重和详情，不代表真实推荐。",
+    dimensions: Object.fromEntries(scoreDimensions.map((d, i) => [d.key, {reason: "Fictional scoring example",
+      criteria: Object.fromEntries(d.criteria.map(c => [c.key, {value: values[i], reason: "Synthetic example; replace with specific JD and candidate evidence."}]))}])) as DetailedAssessment["dimensions"] };
+}
 
 /** Entirely fictional UI fixtures. These are not real openings, applications, or pay estimates. */
 const unverifiedCompensation: Compensation = {
@@ -38,6 +46,7 @@ function example(input: Pick<Opportunity, "id" | "company" | "role"> & Partial<O
     eligibility: "Degree, experience, and start-date requirements need an official source.",
     hardGap: "Evidence has not been collected.",
     nextStep: "Replace this example with a specific official JD and your own diligence.",
+    work: {track: null, contract: null, start: "Not recorded", hours: "Not recorded", duration: "Not recorded", workplace: "Not stated", travel: "Not recorded", payUnit: "Not stated", portfolio: "Not recorded", deadline: null},
     ...input
   };
 }
@@ -123,13 +132,20 @@ export const demoData: DashboardData = {
     }),
     example({
       id: "demo-summit-gated", company: "Demo Summit", role: "Research Scientist",
-      researchStatus: "Not actionable", hardGap: "Example hard gate: required qualification not yet met.",
-      nextStep: "Keep the reason explicit; reassess only if the requirement or candidate profile changes."
+      researchStatus: "Needs validation", hardGap: "Example requirement gap: qualification needs confirmation; advisory only.",
+      nextStep: "Keep the uncertainty visible; the user decides whether to pursue this role."
     })
   ],
   interviews: [{ opportunityId: "demo-harbor-interview", stage: "Sample research discussion", date: "2026-08-26", status: "Fictional" }],
   events: [],
   secondaryCriteria: { status: "Customize locally", items: ["Work content", "Career trajectory", "Compensation quality", "Geography and lifestyle"] }
 };
+
+const sampleContracts = ["Full-time", "Full-time", "Internship", "Internship", "Full-time", "Part-time", "Freelance", null] as const;
+const sampleScores = [[78,72,80,70],[75,70,85,80],[84,78,70,75],[82,76,70,65],[76,60,88,90],[68,65,58,75],[55,50,65,45]];
+demoData.opportunities = demoData.opportunities.map((item, index) => ({
+  ...item, work: {...item.work!, contract: sampleContracts[index]},
+  detailedAssessment: sampleScores[index] ? sampleAssessment(sampleScores[index]) : undefined
+}));
 
 export default demoData;

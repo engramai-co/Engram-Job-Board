@@ -25,7 +25,7 @@ Use fictional fixtures when reproducing problems. Keep private data in `src/data
 - Use descriptive commit messages; no special prefix is required.
 - Match nearby TypeScript/React conventions: explicit types at data boundaries, small components, and no new backend or telemetry without prior discussion.
 
-Review is best effort. Maintainers may ask for a smaller scope or decline changes that conflict with the read-only, local-first design. See [Governance](GOVERNANCE.md).
+Review is best effort. Maintainers may ask for a smaller scope or decline changes that conflict with the user-controlled, local-first design. See [Governance](GOVERNANCE.md).
 
 ## Publication safety
 

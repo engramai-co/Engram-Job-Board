@@ -1,16 +1,29 @@
 # Engram-Job-Board: detailed setup
 
-A local-first application tracker and evidence-led job research dashboard, maintained through code instead of forms. Built by [Engram](https://github.com/engramai-co).
+A local-first application tracker and evidence-led job research dashboard. Edit progress through forms; maintain detailed research and scores in typed data or with the bundled skill. Built by [Engram](https://github.com/engramai-co).
 
-**Status: early release.** React, TypeScript, Vite and Apache ECharts. No account, backend, database, analytics, or paid API required. All shipped companies, roles, evidence and compensation are fictional examples—not live openings or recommendations.
+**Status: early release.** React, TypeScript, Vite, Mantine and Apache ECharts. No account, backend, database, analytics, or paid API required. All shipped companies, roles, evidence, scores and compensation are fictional examples—not live openings or recommendations. The interface is primarily Chinese; official job titles retain their source language.
 
 ## Two workspaces, one source of truth
 
-- **Application tracker:** actual applications and offers, a large interactive portfolio donut, slice-to-table filtering, interview stages, and calendar.
-- **Research:** a separate exact-JD ledger, actionability charts, eligibility gates, mandate evidence, compensation sources, and next steps. Research targets do not inflate application counts.
-- **Reusable research skill:** discovery → official careers-site inspection → exact-JD evidence → baseline comparison → a concrete next action.
+- **Application tracker:** applications and offers, portfolio donut, slice-to-table filtering, status menus, table/board views, linked interviews, events and calendar.
+- **Research:** exact-JD ledger, contract pools with independent rankings, detailed score evidence, freshness warnings and applied/pending views. No automatic eligibility or age filters.
+- **Reusable skill:** LinkedIn + official discovery → exact JD → candidate evidence → scoring → next action. Current offers are an optional baseline, not a required assumption.
 
-The dashboard is deliberately read-only. Edit typed data yourself or ask your coding agent to maintain it. This is a personal tracking tool, not an employer listings marketplace or an automatic application service.
+Status menus, job drawers and schedule forms share stable records across views. Marking a job Applied only updates your tracker; it never submits an employer application. This is not an employer marketplace or an automated application service.
+
+## Browser-local storage and backups
+
+Edits persist in localStorage for this browser and origin (scheme, hostname and port), with separate namespaces for demo/local mode and profile name + cycle. No data is sent to a server. Different devices, browsers, origins or profile names do **not** automatically share edits.
+
+- Keep a stable localhost port. A different port opens a different browser store.
+- Clearing site data or closing an incognito session can erase edits. Export regularly using **导出本机记录** in the footer.
+- **恢复备份** validates the workspace and adds missing IDs only. It does not overwrite existing records, including newer edits or archives. Restore into a fresh browser on the same workspace for a full recovery.
+- The JSON contains edits, interviews and events—not the complete source dataset or detailed research scores. Back up your ignored local source file separately, and keep both backups private.
+- Archive is reversible from the application's archive view; it does not delete a research source.
+- Saves require a modern browser with Web Locks on localhost or HTTPS. Concurrent edits to the same record show a conflict rather than silently overwrite. Storage errors leave drafts unsaved and display an error.
+
+This public static edition does not include cloud synchronization, login, Gmail ingestion, or a private deployment backend. Do not store secrets in the page or backup.
 
 ## Quick start
 
@@ -32,6 +45,8 @@ cp src/data/demo.ts src/data/opportunities.local.ts
 ```
 
 Edit the copied file, retaining its default export and `DashboardData` type. The local development server picks it up automatically; the loader derives demo/local mode from the presence of this file. Replace all examples before treating it as your real portfolio. Set `signedOffer: null` if you do not have a baseline offer. Restart the server if you add or remove the local file while it is running.
+
+The demo's final mapping supplies illustrative contracts and scores. Replace or remove that mapping too; it is not a real assessment template. Keep opportunity IDs stable once browser edits reference them. Interactive edits override the corresponding source fields; see [data ownership](data.md).
 
 `*.local.*` is gitignored. Keep CVs, research notes, application receipts and offer letters in an ignored `.private/` directory—or entirely outside the repository. Never paste these into public issues or pull requests.
 
@@ -101,7 +116,7 @@ There is no separate formatter/linter configuration yet; TypeScript, tests and b
 
 Bug reports and focused improvements are welcome in [Issues](https://github.com/engramai-co/Engram-Job-Board/issues). Start larger proposals with an issue before a pull request. Support is best effort; there is no response-time or release-schedule guarantee.
 
-Current priorities are reliable data modeling, useful visualizations, and safe local customization. Unattended job applications, credential storage, mass scraping, employer ratings, and automatic email ingestion are out of scope for this release.
+Current priorities are reliable data modeling, accessible interactions, useful visualizations, and safe local customization. Unattended applications, credential storage, mass scraping, universal employer ratings, and automatic email ingestion are out of scope.
 
 Read [Contributing](../CONTRIBUTING.md), [Governance](../GOVERNANCE.md), [Code of Conduct](../CODE_OF_CONDUCT.md), and [Security](../SECURITY.md). Maintainers handle releases and security reports; no third-party service is connected automatically.
 

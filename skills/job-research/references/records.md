@@ -1,59 +1,56 @@
-# Opportunity evidence contract
+# Opportunity evidence and reconciliation
 
-This is a conceptual contract, not a drop-in TypeScript schema. Adapt it to the user's existing board without breaking its data model. Store each distinct official JD as one opportunity, and preserve history when a role changes.
+Map this conceptual contract to the existing schema. In Engram-Job-Board, consult `src/types.ts` and `docs/data.md`.
 
-## Minimum record
-
-| Field group | Required meaning |
+| Group | Meaning |
 | --- | --- |
-| Identity | Stable ID, company, exact official job title, official job ID if present, exact JD URL. |
-| Verification | `browser` / `official-text` / `discovery-only`, actual checked date, official source links, any inaccessible content. Only actual browser inspection gets a browser-checked date. |
-| JD availability | `Live`, `Evergreen`, `Closed`, or `Unverified`. Use `Unverified` when access/evidence is insufficient; do not guess closure. |
-| Geography | Canonical office list, primary/secondary geography classification, remote constraints; chosen application office only if evidenced. |
-| Mandate | Team/desk, responsibilities, collaborators, work outputs; front-office/core-AI assessments as yes/no/uncertain with supporting evidence when relevant. |
-| Eligibility | Degree, mandatory/preferred experience, graduation-year window, start date, work-authorization requirements; exact source and unresolved gates. |
-| Fit | CV-backed matches, hard gaps, preference mismatches, specific recommendation rationale. |
-| Compensation | Currency, period, base/bonus/sign-on/equity components, first-year and recurring cash, source/date/confidence, guaranteed versus projected, calculation assumptions. |
-| Decision | Explicit current research decision, baseline hurdle judgment, strongest reservation, concrete next step. |
-| Application | Independent lifecycle stage, submission date and evidence if known, exact-role mapping confidence; never inferred from recommendation. |
+| Identity | Stable ID, employer, exact title, requisition, exact JD URL |
+| Sources | Official/ATS or employer LinkedIn; supporting links, method, identity-match uncertainty |
+| Dates | Posted, reposted, discovered, checked, submitted and registered—never conflate them |
+| Availability | Live, Evergreen, Closed, Unchecked; access issues independent |
+| Geography | Verbatim location, canonical cities, remote eligibility, evidenced application office |
+| Terms | Contract, hours, start, duration, workplace, travel, deadline, pay period |
+| Mandate | Responsibilities, outputs, team, collaborators; specialist alignment only when relevant |
+| Fit | CV/portfolio matches, gaps, preferences, evidence-linked subcriteria |
+| Pay | Separate components, currency/period, source/date/confidence, guaranteed versus estimated |
+| Decision | Existing taxonomy, strongest reservation, concrete next step |
+| Application | Actual stage, known submission date, confirmation source, registration date, role mapping |
+| History | Previous links/status, manual exclusions, notes, interviews and events |
 
-Use short supporting excerpts or paraphrases with links, not full copied JDs. An optional confidence label should describe evidence quality, not an invented probability of receiving an offer.
+Use brief sourced paraphrases, not full copied JDs. Unknown fields remain unknown.
 
-## Research decisions
+## This board's verification fields
 
-Keep these separate from application status and JD availability. Use existing equivalent labels when appropriate; do not force a schema migration merely to adopt wording.
+- `jd.source`: `Employer` (official/ATS), `LinkedIn`, `Indeed`, or `User`; omit when unknown.
+- `jd.verification`: `Browser` after actual browser inspection; `Full text` for retrieved full text; `Historical index` for historical evidence; `Unverified` for discovery.
+- `jd.checkedAt`: actual check date, never today by default. Failed checks must not replace a successful verification.
+- `jd.status`: `Live`, `Evergreen`, `Closed`, `Unchecked`, or `Availability unclear`.
+- `jd.match`: `Confirmed`, `Probable`, or `Unresolved`. A possible match does not establish the submitted role.
 
-| Decision | Meaning | Useful next step |
-| --- | --- | --- |
-| Ready to consider | Verified, relevant JD; known hard gates pass; plausible reason to change the baseline decision. | Decide whether to apply or obtain the remaining non-blocking detail. |
-| Needs validation | A potentially qualifying role has a decision-changing uncertainty. | Name the exact question, evidence source, and owner—for example desk alignment or mandatory experience. |
-| High-upside reach | Relevant, verified opportunity with a substantial competitive gap, but no known unsatisfied mandatory gate. | Assess whether the upside justifies targeted preparation or an application. |
-| Monitor opening | No current qualifying opening, or an evergreen channel without a concrete opening/timing. | Identify the official source or trigger to recheck; do not schedule monitoring unless requested. |
-| Deprioritized | Available but below the user's current work-content, compensation, culture, or preference threshold. | Preserve the reason and the condition that would change it. |
-| Not actionable | Closed, explicitly excluded, or blocked by a known mandatory gate. | Archive or revisit only if the blocking condition changes. |
+Homepages belong in supporting notes, not the exact JD field. A missing link can remain blank for a confirmed application; never invent it.
 
-“Applied,” “Interviewing,” and “Offer” are application stages, not research recommendations. Submitted records may retain their research assessment, but must not appear as fresh unsubmitted targets.
+## Deduplication and lifecycle
 
-A mandatory degree or experience mismatch belongs under Not actionable unless the employer confirms an exception. The same applies to a confirmed mismatch against the user's required mandate; use Deprioritized for softer preference or relative-value judgments. “Reach” is not a way to conceal a hard gate. A missing verified JD can be a discovery lead or Monitor opening record, never Ready to consider.
+1. Check active, archived and excluded IDs before import.
+2. Prefer employer + requisition; verify title/location without IDs. Similar titles alone are insufficient.
+3. Preserve URL history. Verify a reissued requisition is the same application before merging.
+4. Keep user-confirmed facts separate from JD facts. Never replace a submitted office with another advertised city.
+5. Use one stable ID across views. Rejected records keep fit evidence and history.
+6. “Applying” is not “applied.” Unknown submission dates stay blank; registration is separate.
+7. Browser edits overlay source data. Check newer edits before refresh; never wipe the workspace to make source changes appear.
 
-## Compensation semantics
+## Advisory decisions
 
-- Store unpublished or unknown amounts as unknown/null, not zero. Preserve a genuine stated zero separately.
-- Recurring cash = annual base + relevant annual cash bonus, with the bonus certainty visibly qualified. First-year cash adds applicable first-year cash payments, including sign-on, and uses any prorating explicitly stated.
-- Keep equity separate from cash. For estimated total compensation, show vesting period, valuation basis, and whether it is liquid. Avoid merging paper equity with guaranteed cash in a single unlabeled number.
-- Official JD ranges are verified **posted ranges**, not verified offers. A recruiter estimate is not a written guarantee. Third-party reported compensation remains an estimate with location, level, sample/date limitations.
-- Flag sign-on repayment, bonus timing, and other known material terms without assuming terms that have not been provided. Do not produce net-of-tax comparisons without suitable current inputs.
+Reuse current labels. Needs validation identifies a question, not a filter. Report competitive gaps and mandatory requirements honestly without hiding jobs. Reach does not mean requirements pass.
 
-## Chart semantics
+Only user-directed exclusions remove targets from active consideration. Do not automatically archive for age, eligibility, score or rejection. Closed jobs can remain in history.
 
-Preserve detailed source fields separately from analytical labels:
+## Pay and analytics
 
-- `officialTitle` can be specific while `roleFamily` groups comparable work consistently.
-- A role available in two cities has two location values, not a new slash-delimited city category.
-- For an application-count pie, each application needs one evidenced office or an explicit unknown/multi-location category. Do not silently assign a preferred city to make slices add up.
-- For location coverage charts, count each supported city once per role, and disclose that the sum can exceed the number of roles. A bar chart is often clearer than a pie for overlapping coverage.
-- Research counts and application counts have different populations. Show the denominator and exclude applied records from an unsubmitted research pipeline.
+Unknown/null differs from explicitly unpaid or verified zero. Preserve currency/period. Recurring cash is base + relevant bonus with uncertainty; first-year adds applicable one-offs. Equity stays separate. Estimates never become verified offers.
 
-## Final consistency check
+Exact titles stay separate from role families. Source location stays separate from chosen application office. Do not create a slash-delimited pseudo-city. Application pies count each submission once with an evidenced office or unknown; multi-location coverage can overlap only with a disclosed denominator.
 
-Check current source URLs versus generic homepages, actual verification dates versus publication dates, known gates versus decision labels, compensation certainty versus wording, and application evidence versus stage. Refresh only the facts actually rechecked. Unresolved fields should stay visible rather than being normalized into false certainty.
+Research and applications have different populations, but submitted records remain inspectable in research. Full-time internships belong in the project pool; unknown contracts stay separate.
+
+Before delivery, check links, dates, status provenance, deduplication, pools, score evidence and linked views. Change only verified or explicitly requested facts.
